@@ -10,12 +10,12 @@ class GraphDisplayer:
 
     def create_graph(self, timing_data, complexity_label="O(n)"):
         # input sizes (x) and runtimes (y) data points
-        x = [n for n, t, _ in timing_data if t is not None]
-        y = [t for n, t, _ in timing_data if t is not None]
+        x = timing_data[:, 0].astype(float)  # input sizes
+        y = timing_data[:, 1].astype(float)  # runtimes
 
-        # checks if valid data exists before plotting
-        if not x or not y:
-            print("No valid data to display.")
+        # checks for empty or invalid data
+        if x.size == 0 or y.size == 0:
+            print("No valid timing data to display.")
             return
 
         self.ax.clear()  # clears previous graph
