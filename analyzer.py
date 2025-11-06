@@ -53,7 +53,7 @@ class Analyzer:
 
             inputs = inputs.reshape(-1, 1)
             best_degree = None
-            best_adj_r2 = 0
+            best_adj_r2 = -1
 
             for degree in range(0, 10):
                 poly = PolynomialFeatures(degree)
@@ -81,7 +81,7 @@ class Analyzer:
 
         def __generate_inputs(self):
             # these numbers are too large for some functions
-            return np.array([1, 10, 100, 1000, 10000])
+            return np.array([1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 10000])
 
 
 def main():
