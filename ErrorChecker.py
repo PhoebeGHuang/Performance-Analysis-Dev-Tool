@@ -5,8 +5,8 @@ import py_compile
 """
 
 IMPORTANT: 
-This should be created inside BigOCalculator.get_time_data(), as
-running this separately will result in user program being ran twice
+This should be created inside Analyzer class, as running
+this separately will result in user program being ran twice
 
 """
 
@@ -22,54 +22,24 @@ class ErrorChecker:
 
         try:
             py_compile.compile(self.program, doraise=True)
-            print("\nProgram contains no syntax errors")  # print statement for testing
+            print("Program contains no syntax errors\n")  # print statement for testing
             return False  # program contains no syntax errors
 
         except py_compile.PyCompileError as err:
-            print("\nSyntax error detected in program!\n")  # print statement for testing
+            print("Syntax error detected in program!")  # print statement for testing
             print(err)
             return True  # syntax error exists
 
-    def detect_infinite_loops(self, timeout=3):
+    def detect_infinite_loops(self, needs_input, inputs=[], timeout=3):
         """Checks if program hangs for too long"""
 
-        def valid_num(var):
-            """Checks if variable can be converted to int"""
-            try:
-                var = int(var)
-                return True
-            except ValueError:
-                return False
-
-        # Ask user if program needs input
-        needs_input = False
-        inputs = list()
-
-        num_inputs = input("How many inputs does your program need?")
-        while not valid_num(num_inputs):
-            num_inputs = input("Invalid response! How many inputs does your program need?")
-        num_inputs = int(num_inputs)
-
-        if num_inputs > 0:
-            needs_input = True
-            for i in range(num_inputs):
-                # Check last digits of num_inputs so correct suffix is used (i.e. 1st, 2nd, 3rd)
-                if 10 <= (i + 1) % 100 <= 13:
-                    suffix = "th"
-                elif (i + 1) % 10 == 1:
-                    suffix = "st"
-                elif (i + 1) % 10 == 2:
-                    suffix = "nd"
-                elif (i + 1) % 10 == 3:
-                    suffix = "rd"
-                else:
-                    suffix = "th"
-                required_input = input(f"What is the {i + 1}{suffix} required input in your program?")
-                inputs.append(required_input)
-
         try:
+            # check if user program needs inputs
             if needs_input:
                 input_string = "\n".join(str(x) for x in inputs) + "\n"
+
+                print(input_string)
+
                 result = subprocess.run(
                     ["python", self.program],
                     input=input_string,
@@ -85,18 +55,21 @@ class ErrorChecker:
                     timeout=timeout
                 )
             if result.returncode != 0:
-                print("\nRuntime error detected!\n")
+                print("Runtime error detected!\n")
                 print(result.stderr)
                 return "runtime_error"
 
-            print("\nProgram executed successfully")
+            print("Program executed successfully")
             return "no_error"
 
         except subprocess.TimeoutExpired:
-            print("\nProgram timed out! Fix any infinite loops or other similar issues")
+            print("Program timed out! Fix any infinite loops or other similar issues\n")
             return "timed_out"
 
         except Exception as err:
-            print("\nAn unexpected error has occurred!\n")
+            print("An unexpected error has occurred!")
             print(err)
             return "unexpected_error"
+
+    def change_program(self, new_program):
+        self.program = new_program
