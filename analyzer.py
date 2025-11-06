@@ -45,11 +45,11 @@ class Analyzer:
             time_vals = np.empty(len(inputs))
             # works for one-parameter functions
             for i in range(len(inputs)):
-                code_obj = compile(self.code + "\n" + self.function_name + "(" + str(inputs[i]) + ")",
+                code_obj = compile(f"{self.code}\n{self.function_name}({inputs[i]})",
                                    "<string>", "exec")
                 time_vals[i] = min(timeit.repeat(lambda: exec(code_obj),
-                                                 timer=time.perf_counter_ns, repeat=5, number=10000)) / 10000
-            self.time_data = np.concatenate((inputs, time_vals))
+                                                 timer=time.perf_counter_ns, repeat=5, number=10000)) // 10000
+            self.time_data = np.column_stack((inputs, time_vals))
 
             inputs = inputs.reshape(-1, 1)
             best_degree = None
@@ -71,9 +71,7 @@ class Analyzer:
                     best_adj_r2 = adj_r2
                     best_degree = degree
 
-                if degree == 0:
-                    return "O(1)"
-                return f"$O(n^{best_degree})$"
+            return f"$O(n^{best_degree})$"
 
         def get_time_data(self):
             if self.time_data is not None:
