@@ -17,8 +17,8 @@ class CodeDisplayer(tk.Frame):
         y_scroll = ttk.Scrollbar(text_frame, orient="vertical")
         y_scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
-        # horizontal scrollbar (now spans entire bottom)
-        x_scroll = ttk.Scrollbar(self.master, orient="horizontal")
+        # horizontal scrollbar
+        x_scroll = ttk.Scrollbar(text_frame, orient="horizontal")
         x_scroll.pack(side=tk.BOTTOM, fill=tk.X)
 
         # text area
@@ -36,7 +36,7 @@ class CodeDisplayer(tk.Frame):
         )
         self.text_area.pack(fill=tk.BOTH, expand=True, side=tk.LEFT)
 
-        # link scrollbars
+        # links scrollbars
         y_scroll.config(command=self.text_area.yview)
         x_scroll.config(command=self.text_area.xview)
 
@@ -49,6 +49,18 @@ class CodeDisplayer(tk.Frame):
 
         ttk.Button(button_frame, text="Open File", command=self.get_code).pack(pady=5)
         ttk.Button(button_frame, text="Clear", command=self.clear_contents).pack(pady=5)
+
+        # instructional note about main files
+        note_label = ttk.Label(
+            button_frame,
+            text="Note: Only upload files containing a main() function.\n\n"
+                 "The analyzer measures performance on the main execution block.",
+            foreground="#555",
+            font=("Segoe UI", 10, "italic"),
+            justify="left",
+            wraplength=200
+        )
+        note_label.pack(pady=(20, 0), anchor="w")
 
     # file operations
     def get_code(self):
