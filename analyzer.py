@@ -94,7 +94,7 @@ class Analyzer:
 
         def calculate(self):
             """Returns a string in LaTeX format showing Big-O time complexity of program"""
-            vals = self.__generate_variable_vals()  # generate values for testing main()
+            vals = self.__generate_variable_vals()  # generate values for testing main()  TODO: use vals inside program
             time_vals = np.empty(len(vals))  # create an empty NumPy array
 
             for i in range(len(vals)):  # for each input, run the program
