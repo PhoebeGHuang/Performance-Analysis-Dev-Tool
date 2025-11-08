@@ -5,10 +5,10 @@ from analyzer import Analyzer
 class TestBigO(TestCase):
     def test_calculate(self):
         an = Analyzer("def print_constant(n):\n\tprint(\"constant\")", "n")
-        self.assertEqual(an.calc.calculate(), "O(1)")
+        self.assertEqual(an.calc.calculate(), "$O(1)$")
 
         an = Analyzer("def print_first(arr):\n\tprint(arr[0])", "len(arr)")
-        self.assertEqual(an.calc.calculate(), "O(1)")
+        self.assertEqual(an.calc.calculate(), "$O(1)$")
 
     def test_syntax_error(self):
         an = Analyzer("def syntax_error(n):\n\tprint(x)", "n")
