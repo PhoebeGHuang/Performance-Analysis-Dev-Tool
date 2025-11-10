@@ -1,5 +1,6 @@
 import subprocess
 import py_compile
+import re
 import time
 import timeit
 import numpy as np
@@ -18,14 +19,15 @@ class Analyzer:
         else:
             self.input_string = None
 
-        self.error_check = self.ErrorChecker(program, needs_input, self.input_string)
+        self.error_check = self.ErrorChecker(program, n, needs_input, self.input_string)
         self.calc = self.BigOCalculator(program, n, needs_input, self.input_string)
 
     class ErrorChecker:
         """print statements are used for temporary debugging and will be replaced with GUI later"""
 
-        def __init__(self, program, needs_input, input_string):
+        def __init__(self, program, n, needs_input, input_string):
             self.program = program  # program is a subprocess
+            self.n = n
             self.needs_input = needs_input
             self.input_string = input_string
 
@@ -94,12 +96,15 @@ class Analyzer:
 
         def calculate(self):
             """Returns a string in LaTeX format showing Big-O time complexity of program"""
-            vals = self.__generate_variable_vals()  # generate values for testing main()  TODO: use vals inside program
+            vals = self.__generate_variable_vals()  # generate values for testing main()
             time_vals = np.empty(len(vals))  # create an empty NumPy array
 
             for i in range(len(vals)):  # for each input, run the program
+                # modify all assignments of n so that n equals the input value we want to test
+                # TODO: fix so that only main() is modified, not the entire file
+                re.sub(f"\\b{self.n}\\s+=\\s+.+", lambda match_obj: f"{self.n} = {vals[i]}", self.program)
                 if self.needs_input:  # time execution, taking set with best average (5 sets, 100 executions each)
-                    time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", self.program],
+                    time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", "-c", f"import {self.program[:-3]}; {self.program[:-3]}.main()"],
                                                                             input=self.input_string,
                                                                             capture_output=True,
                                                                             text=True
@@ -110,7 +115,7 @@ class Analyzer:
                                        ) // 100
                 else:  # time execution, taking set with best average (5 sets, 100 executions each)
                     if self.needs_input:  # time execution, taking set with best average (5 sets, 100 executions each)
-                        time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", self.program],
+                        time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", "-c", f"import {self.program[:-3]}; {self.program[:-3]}.main()"],
                                                                                 capture_output=True,
                                                                                 text=True
                                                                                 ),
