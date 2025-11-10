@@ -2,15 +2,6 @@ import subprocess
 import py_compile
 
 
-"""
-
-IMPORTANT: 
-This should be created inside Analyzer class, as running
-this separately will result in user program being ran twice
-
-"""
-
-
 class ErrorChecker:
     """print statements are used for temporary debugging and will be replaced with GUI later"""
 
@@ -22,11 +13,11 @@ class ErrorChecker:
 
         try:
             py_compile.compile(self.program, doraise=True)
-            print("Program contains no syntax errors\n")  # print statement for testing
+            print("Program contains no syntax errors\n")
             return False  # program contains no syntax errors
 
         except py_compile.PyCompileError as err:
-            print("Syntax error detected in program!")  # print statement for testing
+            print("Syntax error detected in program!")
             print(err)
             return True  # syntax error exists
 
@@ -34,12 +25,9 @@ class ErrorChecker:
         """Checks if program hangs for too long"""
 
         try:
-            # check if user program needs inputs
+            # check if user program needs inputs before running
             if needs_input:
                 input_string = "\n".join(str(x) for x in inputs) + "\n"
-
-                print(input_string)
-
                 result = subprocess.run(
                     ["python", self.program],
                     input=input_string,
