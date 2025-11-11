@@ -1,13 +1,15 @@
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
+import CodeHighlighter
+
 
 class CodeDisplayer(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
         self.master.title("Optimizer Dev Tool")
-        self.master.geometry("900x600")
+        self.master.geometry("1280x720")  # temporarily set to 720p res
 
         # frame for text area and scrollbars
         text_frame = ttk.Frame(self)
@@ -28,8 +30,8 @@ class CodeDisplayer(tk.Frame):
             yscrollcommand=y_scroll.set,
             xscrollcommand=x_scroll.set,
             font=("Consolas", 12),
-            background="#1e1e1e",      # dark box
-            foreground="#dcdcdc",      # light text
+            background="#1e1e1e",  # dark box
+            foreground="#dcdcdc",  # light text
             insertbackground="white",  # white cursor
             relief="flat",
             borderwidth=0
@@ -49,6 +51,7 @@ class CodeDisplayer(tk.Frame):
 
         ttk.Button(button_frame, text="Open File", command=self.get_code).pack(pady=5)
         ttk.Button(button_frame, text="Clear", command=self.clear_contents).pack(pady=5)
+        ttk.Button(button_frame, text="Submit", command=self.submit_code).pack(pady=5)
 
         # instructional note about main files
         note_label = ttk.Label(
@@ -92,6 +95,52 @@ class CodeDisplayer(tk.Frame):
     def clear_contents(self):
         # clears text area
         self.text_area.delete("1.0", tk.END)
+
+    def submit_code(self):
+        # make sure text area isn't empty
+        content = self.text_area.get("1.0", "end-1c").strip()
+        if not content:
+            messagebox.showinfo("Could not submit", "Text entry field is empty!")
+            return
+
+        else:
+            # check if code needs input
+            inputs = []
+            while True:
+                num_inputs = simpledialog.askstring(title="Number of inputs",
+                                                    prompt="How many inputs does your program need? "
+                                                           "(Type a positive integer, or 0)",
+                                                    parent=root)
+                # exits if user clicks cancel
+                if num_inputs is None:
+                    return
+                # make sure input is valid
+                try:
+                    num_inputs = int(num_inputs)
+                    if num_inputs < 0:
+                        continue
+                    break
+                except ValueError:
+                    continue
+
+            # prompt user for required inputs to run program
+            needs_input = num_inputs > 0
+            if needs_input:
+                suffixes = {1: "st", 2: "nd", 3: "rd"}
+                for i in range(num_inputs):
+                    if 10 <= (i + 1) % 100 <= 20:
+                        suffix = "th"
+                    else:
+                        suffix = suffixes.get((i + 1) % 10, "th")
+                    user_input = simpledialog.askstring(title=f"Input #{i + 1}",
+                                                        prompt=f"What is the {i + 1}{suffix} input in your program?",
+                                                        parent=root)
+                    if user_input is None:
+                        return
+                    inputs.append(user_input)
+
+            selection = CodeHighlighter.CodeHighlighter(self.text_area, needs_input, inputs)
+            selection.submit_selection()
 
 
 # test
