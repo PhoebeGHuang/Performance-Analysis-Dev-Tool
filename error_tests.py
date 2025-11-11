@@ -33,3 +33,17 @@ class TestErrorChecker(TestCase):
         self.assertFalse(syntax_error)
         timeout = ec.detect_infinite_loops(needs_input=False)
         self.assertEqual(timeout, "runtime_error")
+
+    def test_inputs(self):
+        ec = ErrorChecker.ErrorChecker("test_programs/inputs.py")
+        syntax_error = ec.detect_syntax_errors()
+        self.assertFalse(syntax_error)
+
+        timeout = ec.detect_infinite_loops(needs_input=True, inputs=[1, 5, 5])
+        self.assertEqual(timeout, "no_error")
+
+        timeout = ec.detect_infinite_loops(needs_input=True, inputs=[2, 5, 5])
+        self.assertEqual(timeout, "no_error")
+
+        timeout = ec.detect_infinite_loops(needs_input=True, inputs=[3, 5, 0])
+        self.assertEqual(timeout, "runtime_error")

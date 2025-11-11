@@ -3,25 +3,24 @@ import py_compile
 
 
 class ErrorChecker:
-    """print statements are used for temporary debugging and will be replaced with GUI later"""
 
     def __init__(self, program):
         self.program = program  # program is a subprocess
+        self.err = ""
 
     def detect_syntax_errors(self):
         """Detects syntax errors without having to run the program"""
 
         try:
+            print(self.program)
             py_compile.compile(self.program, doraise=True)
-            print("Program contains no syntax errors\n")
             return False  # program contains no syntax errors
 
         except py_compile.PyCompileError as err:
-            print("Syntax error detected in program!")
-            print(err)
+            self.err = err
             return True  # syntax error exists
 
-    def detect_infinite_loops(self, needs_input, inputs=[], timeout=3):
+    def detect_infinite_loops(self, needs_input=False, inputs=[], timeout=1):
         """Checks if program hangs for too long"""
 
         try:
@@ -43,20 +42,18 @@ class ErrorChecker:
                     timeout=timeout
                 )
             if result.returncode != 0:
-                print("Runtime error detected!\n")
-                print(result.stderr)
+                self.err = result.stderr
                 return "runtime_error"
 
             print("Program executed successfully")
             return "no_error"
 
         except subprocess.TimeoutExpired:
-            print("Program timed out! Fix any infinite loops or other similar issues\n")
+            self.err = "Timed out!\n Fix any infinite loops or other similar issues!"
             return "timed_out"
 
         except Exception as err:
-            print("An unexpected error has occurred!")
-            print(err)
+            self.err = err
             return "unexpected_error"
 
     def change_program(self, new_program):
