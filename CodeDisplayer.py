@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
 import CodeHighlighter
+from AlgorithmDescriber import AlgorithmDescriber
 
 
 class CodeDisplayer(tk.Frame):
@@ -49,9 +50,20 @@ class CodeDisplayer(tk.Frame):
         button_frame = ttk.Frame(self)
         button_frame.pack(fill=tk.Y, side=tk.RIGHT, padx=10, pady=10)
 
+        # function buttons
         ttk.Button(button_frame, text="Open File", command=self.get_code).pack(pady=5)
         ttk.Button(button_frame, text="Clear", command=self.clear_contents).pack(pady=5)
         ttk.Button(button_frame, text="Submit", command=self.submit_code).pack(pady=5)
+
+        # instructional section
+        ttk.Separator(button_frame, orient="horizontal").pack(fill="x", pady=(25, 10))
+        ttk.Label(button_frame, text="Student Guide", font=("Segoe UI", 10, "italic"), foreground="#666").pack(
+            anchor="center", pady=(0, 5))
+
+        # standard algorithms button
+        ttk.Button(button_frame, text="Standard Algorithms",
+                   command=lambda: AlgorithmDescriber().show_popup(self.master)).pack(pady=5)
+
 
         # instructional note about upload or typing
         usage_note = ttk.Label(
@@ -62,7 +74,7 @@ class CodeDisplayer(tk.Frame):
             justify="left",
             wraplength=200
         )
-        usage_note.pack(pady=(20, 0), anchor="w")
+        usage_note.pack(pady=(15, 0), anchor="w");
 
         # instructional note about main files
         note_label = ttk.Label(
@@ -74,7 +86,7 @@ class CodeDisplayer(tk.Frame):
             justify="left",
             wraplength=200
         )
-        note_label.pack(pady=(20, 0), anchor="w")
+        note_label.pack(pady=(10, 0), anchor="w")
 
     # file operations
     def get_code(self):
