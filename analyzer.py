@@ -1,5 +1,6 @@
 import subprocess
 import py_compile
+import os
 import re
 import time
 import timeit
@@ -12,7 +13,7 @@ from sklearn.metrics import r2_score
 class Analyzer:
 
     def __init__(self, program, n, needs_input, inputs=None):
-        self.program = program  # program is a subprocess
+        self.program = program  # program is a filename
         self.needs_input = needs_input
         if self.needs_input:
             self.input_string = "\n".join(str(x) for x in inputs) + "\n"
@@ -96,33 +97,45 @@ class Analyzer:
 
         def calculate(self):
             """Returns a string in LaTeX format showing Big-O time complexity of program"""
+            prog_file = open(self.program, mode='r')  # read in user program
+            code = prog_file.read()
+            prog_file.close()
+            prog_file_copy = open(self.program[:-3] + "_copy.py", mode='w')  # create temporary copy for analysis
+
             vals = self.__generate_variable_vals()  # generate values for testing main()
             time_vals = np.empty(len(vals))  # create an empty NumPy array
 
-            for i in range(len(vals)):  # for each input, run the program
+            for i in range(len(vals)):  # for each value of n, run the program
                 # modify all assignments of n so that n equals the input value we want to test
                 # TODO: fix so that only main() is modified, not the entire file
-                re.sub(f"\\b{self.n}\\s+=\\s+.+", lambda match_obj: f"{self.n} = {vals[i]}", self.program)
-                if self.needs_input:  # time execution, taking set with best average (5 sets, 100 executions each)
-                    time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", "-c", f"import {self.program[:-3]}; {self.program[:-3]}.main()"],
+                new_code = re.sub(f"\\b{self.n}\\s+=\\s+.+", lambda match_obj: f"{self.n} = {vals[i]}", code)
+                prog_file_copy.seek(0)
+                prog_file_copy.truncate()
+                prog_file_copy.write(new_code)
+                prog_file_copy.flush()
+
+                if self.needs_input:  # time execution, taking best of 5 executions
+                    time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", self.program[:-3] + "_copy.py"],
                                                                             input=self.input_string,
                                                                             capture_output=True,
                                                                             text=True
                                                                             ),
                                                      timer=time.perf_counter_ns,
                                                      repeat=5,
-                                                     number=100)
-                                       ) // 100
-                else:  # time execution, taking set with best average (5 sets, 100 executions each)
-                    if self.needs_input:  # time execution, taking set with best average (5 sets, 100 executions each)
-                        time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", "-c", f"import {self.program[:-3]}; {self.program[:-3]}.main()"],
-                                                                                capture_output=True,
-                                                                                text=True
-                                                                                ),
-                                                         timer=time.perf_counter_ns,
-                                                         repeat=5,
-                                                         number=100)
-                                           ) // 100
+                                                     number=1)
+                                       )
+                else:  # time execution, taking best of 5 executions
+                    time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", self.program[:-3] + "_copy.py"],
+                                                                            capture_output=True,
+                                                                            text=True
+                                                                            ),
+                                                     timer=time.perf_counter_ns,
+                                                     repeat=5,
+                                                     number=1)
+                                       )
+
+            prog_file_copy.close()
+            os.remove(self.program[:-3] + "_copy.py")
 
             self.time_data = np.column_stack((vals, time_vals))  # create 2D NumPy array for plotting
 
@@ -162,5 +175,4 @@ class Analyzer:
 
         def __generate_variable_vals(self):
             """Returns values to be used for variable being modified"""
-            # TODO
-            return np.array([1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 10000])
+            return np.array([1, 2, 5, 8, 10, 20, 50, 80, 100, 200, 500])
