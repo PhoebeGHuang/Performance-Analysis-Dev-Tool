@@ -53,6 +53,17 @@ class CodeDisplayer(tk.Frame):
         ttk.Button(button_frame, text="Clear", command=self.clear_contents).pack(pady=5)
         ttk.Button(button_frame, text="Submit", command=self.submit_code).pack(pady=5)
 
+        # instructional note about upload or typing
+        usage_note = ttk.Label(
+            button_frame,
+            text="You can upload a code file or paste code directly.",
+            foreground="#555",
+            font=("Segoe UI", 10, "italic"),
+            justify="left",
+            wraplength=200
+        )
+        usage_note.pack(pady=(20, 0), anchor="w")
+
         # instructional note about main files
         note_label = ttk.Label(
             button_frame,
