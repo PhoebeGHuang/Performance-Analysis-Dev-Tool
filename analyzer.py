@@ -43,12 +43,12 @@ class Analyzer:
                 self.err = err
                 return True  # syntax error exists
 
-        def detect_infinite_loops(self, needs_input=False, inputs=[], timeout=1):
+        def detect_infinite_loops(self, timeout=1):
             """Checks if program hangs for too long"""
 
             try:
                 # check if user program needs inputs before running
-                if needs_input:
+                if self.needs_input:
                     result = subprocess.run(
                         ["python", self.program],
                         input=self.input_string,
