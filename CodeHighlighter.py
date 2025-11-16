@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import os
 from analyzer import Analyzer
+from FeedbackPopup import FeedbackPopup
 
 
 class CodeHighlighter:
@@ -40,6 +41,9 @@ class CodeHighlighter:
                     runtime_result = ec.detect_infinite_loops()
                     if not ec.err == "":
                         messagebox.showerror(runtime_result, f"Your program could not run properly:\n\n{ec.err}")
+                    else:
+                        complexity = an.calc.calculate()
+                        FeedbackPopup.show_message("The time complexity of the code is " + complexity)
                 else:
                     messagebox.showerror("Syntax error found in your program", ec.err)
 

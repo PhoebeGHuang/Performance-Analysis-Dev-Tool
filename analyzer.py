@@ -133,7 +133,6 @@ class Analyzer:
 
             vals = vals.reshape(-1, 1)  # reshape inputs array for regression
             best_adj_r2 = -1  # track the adjusted R^2 to determine the best-fitting degree of polynomial
-            best_degree = None
             best_model = None
 
             for degree in range(1, 6):  # try polynomial degrees between 0-5 inclusive
@@ -150,7 +149,6 @@ class Analyzer:
 
                 if adj_r2 > best_adj_r2:  # keep track of degree with highest adjusted R^2
                     best_adj_r2 = adj_r2
-                    best_degree = degree
                     best_model = model
 
             if best_adj_r2 < 0.5:  # runtime is poorly correlated with n
