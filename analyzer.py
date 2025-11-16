@@ -142,7 +142,7 @@ class Analyzer:
             best_degree = None
             best_model = None
 
-            for degree in range(0, 6):  # try polynomial degrees between 0-5 inclusive
+            for degree in range(1, 6):  # try polynomial degrees between 0-5 inclusive
                 poly = PolynomialFeatures(degree)  # create polynomial of degree n
                 x_poly = poly.fit_transform(vals)  # transform input data for regression
                 model = LinearRegression().fit(x_poly, time_vals)  # fit polynomial to data
@@ -159,18 +159,20 @@ class Analyzer:
                     best_degree = degree
                     best_model = model
 
-            while best_degree > 0:  # get rid of insignificant high-order terms
-                if best_model.coef_[best_degree] < 1e-3 * max(best_model.coef_):
-                    best_degree -= 1
-                else:
-                    break
-
-            if best_degree == 0:  # return time complexity
+            if best_adj_r2 < 0.5:  # runtime is poorly correlated with n
                 return "$O(1)$"
-            elif best_degree == 1:
+
+            degree = 1
+            highest_coef = 0  # find poly term with largest coefficient
+            for i in range(1, len(best_model.coef_)):
+                if best_model.coef_[i] > highest_coef:
+                    degree = i
+                    highest_coef = best_model.coef_[i]
+
+            if degree == 1:
                 return "$O(n)$"
             else:
-                return f"$O(n^{best_degree})$"
+                return f"$O(n^{degree})$"
 
         def get_time_data(self):
             """Returns time data for plotting"""
