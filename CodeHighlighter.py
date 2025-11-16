@@ -37,7 +37,7 @@ class CodeHighlighter:
                 # check for errors in user code
                 ec = an.error_check
                 if not ec.detect_syntax_errors():
-                    runtime_result = ec.detect_infinite_loops(self.needs_input, self.inputs)
+                    runtime_result = ec.detect_infinite_loops()
                     if not ec.err == "":
                         messagebox.showerror(runtime_result, f"Your program could not run properly:\n\n{ec.err}")
                 else:
