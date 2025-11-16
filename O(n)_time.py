@@ -1,7 +1,9 @@
+n = 1
+
+
 def main():
-    n = 1
     for i in range(n):
-        print(n)
+        print("O(n)")
 
 
 if __name__ == "__main__":
