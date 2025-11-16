@@ -1,5 +1,7 @@
 import subprocess
 import py_compile
+import importlib.util
+import os
 import re
 import time
 import timeit
@@ -12,7 +14,7 @@ from sklearn.metrics import r2_score
 class Analyzer:
 
     def __init__(self, program, n, needs_input, inputs=None):
-        self.program = program  # program is a subprocess
+        self.program = program  # program is a filename
         self.needs_input = needs_input
         if self.needs_input:
             self.input_string = "\n".join(str(x) for x in inputs) + "\n"
@@ -96,41 +98,51 @@ class Analyzer:
 
         def calculate(self):
             """Returns a string in LaTeX format showing Big-O time complexity of program"""
+
+            spec = importlib.util.spec_from_file_location("user_program", self.program)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
             vals = self.__generate_variable_vals()  # generate values for testing main()
             time_vals = np.empty(len(vals))  # create an empty NumPy array
 
-            for i in range(len(vals)):  # for each input, run the program
-                # modify all assignments of n so that n equals the input value we want to test
-                # TODO: fix so that only main() is modified, not the entire file
-                re.sub(f"\\b{self.n}\\s+=\\s+.+", lambda match_obj: f"{self.n} = {vals[i]}", self.program)
-                if self.needs_input:  # time execution, taking set with best average (5 sets, 100 executions each)
-                    time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", "-c", f"import {self.program[:-3]}; {self.program[:-3]}.main()"],
+            if self.needs_input:  # time execution, taking best of 5 executions
+                with open(self.program, mode='r') as prog_file:  # read in user program
+                    code = prog_file.read()
+                code = 'import sys\n' + code  # modify all assignments of n to equal a command line argument
+                pattern = re.compile(f"\\b{self.n}\\s+=\\s+.+")
+                code = pattern.sub(f"{self.n} = int(sys.argv[1])", code)
+                with open(self.program[:-3] + "_copy.py", mode='w') as prog_file_copy:  # create temporary copy for analysis
+                    prog_file_copy.write(code)
+                for i in range(len(vals)):  # for each value of n, run the program
+                    time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", self.program[:-3] + "_copy.py", str(vals[i])],
                                                                             input=self.input_string,
                                                                             capture_output=True,
                                                                             text=True
                                                                             ),
                                                      timer=time.perf_counter_ns,
                                                      repeat=5,
-                                                     number=100)
-                                       ) // 100
-                else:  # time execution, taking set with best average (5 sets, 100 executions each)
-                    if self.needs_input:  # time execution, taking set with best average (5 sets, 100 executions each)
-                        time_vals[i] = min(timeit.repeat(lambda: subprocess.run(["python", "-c", f"import {self.program[:-3]}; {self.program[:-3]}.main()"],
-                                                                                capture_output=True,
-                                                                                text=True
-                                                                                ),
-                                                         timer=time.perf_counter_ns,
-                                                         repeat=5,
-                                                         number=100)
-                                           ) // 100
+                                                     number=1)
+                                       )
+                os.remove(self.program[:-3] + "_copy.py")
+
+            else:  # time execution, taking best of 5 executions
+                for i in range(len(vals)):  # for each value of n, run the program
+                    module.n = vals[i]
+                    time_vals[i] = min(timeit.repeat(lambda: module.main(),
+                                                     timer=time.perf_counter_ns,
+                                                     repeat=5,
+                                                     number=1)
+                                       )
 
             self.time_data = np.column_stack((vals, time_vals))  # create 2D NumPy array for plotting
 
             vals = vals.reshape(-1, 1)  # reshape inputs array for regression
-            best_degree = None
             best_adj_r2 = -1  # track the adjusted R^2 to determine the best-fitting degree of polynomial
+            best_degree = None
+            best_model = None
 
-            for degree in range(0, 10):  # try polynomial degrees between 0-9 inclusive
+            for degree in range(0, 6):  # try polynomial degrees between 0-5 inclusive
                 poly = PolynomialFeatures(degree)  # create polynomial of degree n
                 x_poly = poly.fit_transform(vals)  # transform input data for regression
                 model = LinearRegression().fit(x_poly, time_vals)  # fit polynomial to data
@@ -145,6 +157,13 @@ class Analyzer:
                 if adj_r2 > best_adj_r2:  # keep track of degree with highest adjusted R^2
                     best_adj_r2 = adj_r2
                     best_degree = degree
+                    best_model = model
+
+            while best_degree > 0:  # get rid of insignificant high-order terms
+                if best_model.coef_[best_degree] < 1e-3 * max(best_model.coef_):
+                    best_degree -= 1
+                else:
+                    break
 
             if best_degree == 0:  # return time complexity
                 return "$O(1)$"
@@ -162,5 +181,4 @@ class Analyzer:
 
         def __generate_variable_vals(self):
             """Returns values to be used for variable being modified"""
-            # TODO
-            return np.array([1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 10000])
+            return np.array([5, 7, 10, 15, 20, 30, 40, 60, 80, 120, 160, 240, 320])
