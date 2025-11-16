@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import os
-import ErrorChecker
+from analyzer import Analyzer
 
 
 class CodeHighlighter:
@@ -24,8 +24,18 @@ class CodeHighlighter:
                 file.flush()
                 os.fsync(file.fileno())
 
+                print("ok")
+
+                # create analyzer object
+                an = Analyzer(program="data/submission.py",
+                              n="n",
+                              needs_input=self.needs_input,
+                              inputs=self.inputs)
+
+                print("ok")
+
                 # check for errors in user code
-                ec = ErrorChecker.ErrorChecker("data/submission.py")
+                ec = an.error_check
                 if not ec.detect_syntax_errors():
                     runtime_result = ec.detect_infinite_loops(self.needs_input, self.inputs)
                     if not ec.err == "":
@@ -34,4 +44,4 @@ class CodeHighlighter:
                     messagebox.showerror("Syntax error found in your program", ec.err)
 
         except Exception as e:
-            messagebox.showerror(e, "Error submitting file")
+            messagebox.showerror("Error submitting file", e)
