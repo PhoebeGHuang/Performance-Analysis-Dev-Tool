@@ -21,38 +21,34 @@ class Analyzer:
         else:
             self.input_string = None
 
-        self.error_check = self.ErrorChecker(program, n, needs_input, self.input_string)
+        self.error_check = self.ErrorChecker(program, needs_input, self.input_string)
         self.calc = self.BigOCalculator(program, n, needs_input, self.input_string)
 
     class ErrorChecker:
-        """print statements are used for temporary debugging and will be replaced with GUI later"""
-
-        def __init__(self, program, n, needs_input, input_string):
-            self.program = program  # program is a subprocess
-            self.n = n
+        def __init__(self, program, needs_input, input_string):
+            self.program = program
             self.needs_input = needs_input
             self.input_string = input_string
+            self.err = ""
 
         def detect_syntax_errors(self):
             """Detects syntax errors without having to run the program"""
 
             try:
+                print(self.program)
                 py_compile.compile(self.program, doraise=True)
-                print("Program contains no syntax errors\n")  # print statement for testing
                 return False  # program contains no syntax errors
 
             except py_compile.PyCompileError as err:
-                print("Syntax error detected in program!")  # print statement for testing
-                print(err)
+                self.err = err
                 return True  # syntax error exists
 
-        def detect_infinite_loops(self, timeout=3):
+        def detect_infinite_loops(self, needs_input=False, inputs=[], timeout=1):
             """Checks if program hangs for too long"""
 
             try:
-                # check if user program needs inputs
-                if self.needs_input:
-
+                # check if user program needs inputs before running
+                if needs_input:
                     result = subprocess.run(
                         ["python", self.program],
                         input=self.input_string,
@@ -68,20 +64,18 @@ class Analyzer:
                         timeout=timeout
                     )
                 if result.returncode != 0:
-                    print("Runtime error detected!\n")
-                    print(result.stderr)
+                    self.err = result.stderr
                     return "runtime_error"
 
                 print("Program executed successfully")
                 return "no_error"
 
             except subprocess.TimeoutExpired:
-                print("Program timed out! Fix any infinite loops or other similar issues\n")
+                self.err = "Timed out!\n Fix any infinite loops or other similar issues!"
                 return "timed_out"
 
             except Exception as err:
-                print("An unexpected error has occurred!")
-                print(err)
+                self.err = err
                 return "unexpected_error"
 
         def change_program(self, new_program):

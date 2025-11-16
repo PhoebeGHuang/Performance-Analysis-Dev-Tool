@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
-import CodeHighlighter
+from CodeHighlighter import CodeHighlighter
 from AlgorithmDescriber import AlgorithmDescriber
 
 
@@ -162,7 +162,7 @@ class CodeDisplayer(tk.Frame):
                         return
                     inputs.append(user_input)
 
-            selection = CodeHighlighter.CodeHighlighter(self.text_area, needs_input, inputs)
+            selection = CodeHighlighter(self.text_area, needs_input, inputs)
             selection.submit_selection()
 
 
