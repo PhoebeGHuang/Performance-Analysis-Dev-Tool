@@ -152,7 +152,7 @@ class Analyzer:
                     best_model = model
 
             if best_adj_r2 < 0.5:  # runtime is poorly correlated with n
-                return "$O(1)$"
+                return r"$O(1)$"
 
             degree = 1
             highest_coef = 0  # find poly term with largest coefficient
@@ -162,16 +162,16 @@ class Analyzer:
                     highest_coef = best_model.coef_[i]
 
             if degree == 1:
-                return "$O(n)$"
+                return r"$O(n)$"
             else:
-                return f"$O(n^{degree})$"
+                return rf"$O(n^{degree})$"
 
         def get_time_data(self):
             """Returns time data for plotting"""
             if self.time_data is not None:
                 return self.time_data
             else:
-                return [[]]
+                return np.array([[]])
 
         def __generate_variable_vals(self):
             """Returns values to be used for variable being modified"""

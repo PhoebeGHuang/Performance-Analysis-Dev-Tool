@@ -3,6 +3,7 @@ from tkinter import messagebox
 import os
 from analyzer import Analyzer
 from FeedbackPopup import FeedbackPopup
+from GraphDisplayer import GraphDisplayer
 
 
 class CodeHighlighter:
@@ -19,7 +20,7 @@ class CodeHighlighter:
     def submit_selection(self):
         # submits code to be analyzed
         try:
-            with open("data/submission.py", "w+") as file:
+            with (open("data/submission.py", "w+") as file):
                 file.write(self.selected_text)
                 # make sure file is written before program continues
                 file.flush()
@@ -44,6 +45,8 @@ class CodeHighlighter:
                     else:
                         complexity = an.calc.calculate()
                         FeedbackPopup.show_message("The time complexity of the code is " + complexity)
+                        gd = GraphDisplayer()
+                        gd.create_graph(timing_data=an.calc.get_time_data(), complexity_label=complexity)
                 else:
                     messagebox.showerror("Syntax error found in your program", ec.err)
 

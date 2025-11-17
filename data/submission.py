@@ -1,10 +1,12 @@
 n = 1
 
 
+def print_constant(n):
+    print("constant")
+
+
 def main():
-    for i in range(n):
-        for j in range(n):
-            print("O(n^2)")
+    print_constant(n)
 
 
 if __name__ == "__main__":
