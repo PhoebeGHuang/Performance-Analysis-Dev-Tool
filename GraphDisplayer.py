@@ -31,7 +31,7 @@ class GraphDisplayer:
 
         # labels both axes
         self.ax.set_xlabel("Input Size (n)")
-        self.ax.set_ylabel("Execution Time (seconds)")
+        self.ax.set_ylabel("Execution Time (nanoseconds)")
 
         # ensures x-axis ticks are integers for readability
         self.ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
