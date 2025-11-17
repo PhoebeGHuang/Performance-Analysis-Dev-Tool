@@ -3,7 +3,6 @@ from tkinter import messagebox
 import os
 from analyzer import Analyzer
 from FeedbackPopup import FeedbackPopup
-from GraphDisplayer import GraphDisplayer
 
 
 class CodeHighlighter:
@@ -11,30 +10,34 @@ class CodeHighlighter:
         try:
             # get selected text if possible
             self.selected_text = text_area.get("sel.first", "sel.last")
+            if self.selected_text[:4] != "    ":
+                self.selected_text = "    " + self.selected_text
+            self.selected = True
         except tk.TclError:
             # select everything instead
             self.selected_text = text_area.get("1.0", "end-1c").strip()
+            self.selected = False
         self.needs_input = needs_input
         self.inputs = inputs
 
     def submit_selection(self):
         # submits code to be analyzed
         try:
-            with (open("data/submission.py", "w+") as file):
+            with open("data/submission.py", "w+") as file:
+                if self.selected:
+                    file.write("n = 1\ndef main():\n")
                 file.write(self.selected_text)
+                if self.selected:
+                    file.write("\nmain()")
                 # make sure file is written before program continues
                 file.flush()
                 os.fsync(file.fileno())
-
-                print("ok")
 
                 # create analyzer object
                 an = Analyzer(program="data/submission.py",
                               n="n",
                               needs_input=self.needs_input,
                               inputs=self.inputs)
-
-                print("ok")
 
                 # check for errors in user code
                 ec = an.error_check
@@ -45,8 +48,6 @@ class CodeHighlighter:
                     else:
                         complexity = an.calc.calculate()
                         FeedbackPopup.show_message("The time complexity of the code is " + complexity)
-                        gd = GraphDisplayer()
-                        gd.create_graph(timing_data=an.calc.get_time_data(), complexity_label=complexity)
                 else:
                     messagebox.showerror("Syntax error found in your program", ec.err)
 
