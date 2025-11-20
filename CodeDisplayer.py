@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import Toplevel
+from PIL import Image, ImageTk
 from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
 from CodeHighlighter import CodeHighlighter
@@ -62,7 +64,11 @@ class CodeDisplayer(tk.Frame):
 
         # standard algorithms button
         ttk.Button(button_frame, text="Standard Algorithms",
-                   command=lambda: AlgorithmDescriber().show_popup(self.master)).pack(pady=5)
+                   command=lambda: AlgorithmDescriber().show_popup(self.master), width=15).pack(pady=5)
+
+        # standard algorithms graph button
+        ttk.Button(button_frame, text="Complexities Graph",
+                   command=self.show_complexity_graph, width=15).pack(pady=5)
 
 
         # instructional note about upload or typing
@@ -164,6 +170,24 @@ class CodeDisplayer(tk.Frame):
 
             selection = CodeHighlighter(self.text_area, needs_input, inputs)
             selection.submit_selection()
+
+    # complexities graph
+    def show_complexity_graph(self):
+        graph_path = "graph_common_time_complexities.png"
+
+        window = Toplevel(self.master)
+        window.title("Common Time Complexities Graph")
+
+        try:
+            img = Image.open(graph_path)
+            tk_img = ImageTk.PhotoImage(img)
+
+            label = tk.Label(window, image=tk_img)
+            label.image = tk_img
+            label.pack()
+
+        except Exception as e:
+             tk.Label(window, text=f"Error loading graph: {e}").pack()
 
 
 # test
