@@ -5,7 +5,6 @@ import os
 class AccountManager:
     def __init__(self):
         self.__username = None
-        self.__password = None
         self.__users = None
 
     def get_history_log(self):
