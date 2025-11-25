@@ -5,6 +5,7 @@ from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
 from CodeHighlighter import CodeHighlighter
 from AlgorithmDescriber import AlgorithmDescriber
+from HelpMenu import HelpMenu
 
 
 class CodeDisplayer(tk.Frame):
@@ -69,6 +70,10 @@ class CodeDisplayer(tk.Frame):
         # standard algorithms graph button
         ttk.Button(button_frame, text="Complexities Graph",
                    command=self.show_complexity_graph, width=15).pack(pady=5)
+
+        # help menu
+        ttk.Button(button_frame, text="User Guide",
+                   command=lambda: HelpMenu(self.master).show_help_popup(), width=15).pack(pady=5)
 
 
         # instructional note about upload or typing
