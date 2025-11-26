@@ -1,11 +1,141 @@
-import shutil
+import re
 import os
+import shutil
+from argon2 import PasswordHasher, exceptions
+
+
+def has_special_char(text):
+    # check for characters that are not alphabetical, numerical, or an underscore
+    pattern = r'[^a-zA-Z0-9_]'
+    return bool(re.search(pattern, text))
+
+
+def is_valid_password(password):
+    # password is at least 8 chars
+    if len(password) < 8:
+        print("Password must be at least 8 characters long")
+        return False
+    # password must have a special char
+    if not has_special_char(password):
+        print("Password must have a special character")
+        return False
+    return True
+
+
+def get_hash(username):
+    # retrieve hashed password
+    try:
+        with open(f"users/{username}/pass.bin", "r") as file:
+            return file.readline()
+    except FileNotFoundError:
+        return None
+
+
+def check_password(ph, hashed, password):
+    # verify password is correct
+    try:
+        ph.verify(hashed, password)
+        return True
+    except exceptions.VerifyMismatchError:
+        return False
 
 
 class AccountManager:
-    def __init__(self):
-        self.__username = None
-        self.__users = None
+    def __init__(self, username=None):
+        self.__username = username
+
+    # returns True if success, False if fail
+    def add_account(self, username, password):
+        # username is at least 4 chars
+        if len(username) < 4:
+            print("Username must be at least 4 characters long")
+            return False
+
+        # username must not have special char
+        if has_special_char(username):
+            print("Username cannot have a special character")
+            return False
+
+        if not is_valid_password(password):
+            return False
+
+        # check if username already exists
+        try:
+            os.mkdir(f"users/{username}")
+            os.mkdir(f"users/{username}/data")
+            print("Directory created")
+        except FileExistsError:
+            print("Username already exists")
+            return False
+
+        # store password as a hash
+        with open(f"users/{username}/pass.bin", "wb") as file:
+            ph = PasswordHasher()
+            hashed = ph.hash(password)
+            file.write(hashed.encode("utf-8"))
+
+        print("Account created successfully")
+        self.__username = username
+
+        return True
+
+    def delete_account(self, username, password):
+        # verify username
+        hashed = get_hash(username)
+        if hashed is None:
+            print("Username does not exist")
+            return False
+
+        # verify password
+        ph = PasswordHasher()
+        if check_password(ph, hashed, password):
+            # delete user files
+            shutil.rmtree(f"users/{username}")
+            self.__username = None
+            print("Account successfully deleted")
+            return True
+        else:
+            print("Password is incorrect")
+            return False
+
+    def login(self, username, password):
+        # verify username
+        hashed = get_hash(username)
+        if hashed is None:
+            print("Username or password is incorrect")
+            return False
+
+        # verify password
+        ph = PasswordHasher()
+        if check_password(ph, hashed, password):
+            # login
+            self.__username = username
+            print("Successfully logged in!")
+            return True
+        else:
+            print("Username or password is incorrect")
+            return False
+
+    def change_password(self, username, old_password, new_password):
+        if not self.login(username, old_password):
+            print("Invalid username or password")
+            return False
+
+        if old_password == new_password:
+            print("New password must not be the same as old password!")
+            return False
+
+        if not is_valid_password(new_password):
+            return False
+
+        with open(f"users/{username}/pass.bin", "wb") as file:
+            file.truncate()
+            ph = PasswordHasher()
+            hashed = ph.hash(new_password)
+            file.write(hashed.encode("utf-8"))
+
+        print("Password successfully changed!")
+        return True
 
     def get_history_log(self):
         """Reads history log into a list
@@ -49,3 +179,15 @@ class AccountManager:
             log.write("")
         os.mkdir(f"{self.__username}/data/code")  # create empty directories
         os.mkdir(f"{self.__username}/data/graphs")
+
+
+# test
+def main():
+    am = AccountManager()
+    # am.add_account("User", "User123!")
+    # am.delete_account("User", "User123!")
+    # am.login("User", "User123!")
+    # am.change_password("User", "User123!", "User321!")
+
+
+main()
