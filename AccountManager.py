@@ -63,7 +63,11 @@ class AccountManager:
         try:
             os.mkdir(f"users/{username}")
             os.mkdir(f"users/{username}/data")
-            print("Directory created")
+            os.mkdir(f"users/{username}/data/code")
+            os.mkdir(f"users/{username}/data/graphs")
+            with open(f"users/{username}/data/history_log.txt", "w") as file:
+                pass
+
         except FileExistsError:
             print("Username already exists")
             return False
@@ -184,7 +188,7 @@ class AccountManager:
 # test
 def main():
     am = AccountManager()
-    # am.add_account("User", "User123!")
+    am.add_account("User", "User123!")
     # am.delete_account("User", "User123!")
     # am.login("User", "User123!")
     # am.change_password("User", "User123!", "User321!")
