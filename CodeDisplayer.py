@@ -141,10 +141,11 @@ class CodeDisplayer(tk.Frame):
             # check if code needs input
             inputs = []
             while True:
-                num_inputs = simpledialog.askstring(title="Number of inputs",
-                                                    prompt="How many inputs does your program need? "
-                                                           "(Type a positive integer, or 0)",
-                                                    parent=root)
+                num_inputs = simpledialog.askstring(
+                    title="Number of inputs",
+                    prompt="How many inputs does your program need? (Type a positive integer, or 0)",
+                    parent=self.master
+                )
                 # exits if user clicks cancel
                 if num_inputs is None:
                     return
@@ -166,9 +167,13 @@ class CodeDisplayer(tk.Frame):
                         suffix = "th"
                     else:
                         suffix = suffixes.get((i + 1) % 10, "th")
-                    user_input = simpledialog.askstring(title=f"Input #{i + 1}",
-                                                        prompt=f"What is the {i + 1}{suffix} input in your program?",
-                                                        parent=root)
+
+                    user_input = simpledialog.askstring(
+                        title=f"Input #{i + 1}",
+                        prompt=f"What is the {i + 1}{suffix} input in your program?",
+                        parent=self.master
+                    )
+
                     if user_input is None:
                         return
                     inputs.append(user_input)
@@ -196,8 +201,8 @@ class CodeDisplayer(tk.Frame):
 
 
 # test
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = CodeDisplayer(master=root)
-    app.pack(fill=tk.BOTH, expand=True)
-    root.mainloop()
+# if __name__ == "__main__":
+    # root = tk.Tk()
+    # app = CodeDisplayer(master=root)
+    # app.pack(fill=tk.BOTH, expand=True)
+    # root.mainloop()
