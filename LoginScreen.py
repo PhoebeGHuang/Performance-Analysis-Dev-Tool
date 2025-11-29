@@ -28,7 +28,7 @@ class LoginScreen(ttk.Frame):
         left_panel = tk.Frame(main, bg="black")
         left_panel.grid(row=0, column=0, sticky="nsew")
 
-        img = Image.open("leftpanel.png")
+        img = Image.open("blue1.png")
         img = img.resize((600, 700))  # adjust to fit
         self.bg_image = ImageTk.PhotoImage(img)
 
