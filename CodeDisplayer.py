@@ -4,16 +4,22 @@ from PIL import Image, ImageTk
 from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
 from CodeHighlighter import CodeHighlighter
+from GraphDisplayer import GraphDisplayer
 from AlgorithmDescriber import AlgorithmDescriber
+from HistoryViewer import HistoryViewer
 from HelpMenu import HelpMenu
+from AccountManager import AccountManager
 
 
 class CodeDisplayer(tk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, account_manager=None, graph_displayer=None):
         super().__init__(master)
         self.master = master
         self.master.title("Optimizer Dev Tool")
         self.master.geometry("1280x720")  # temporarily set to 720p res
+        self.account_manager = account_manager
+        self.graph_displayer = graph_displayer
+        self.history_viewer = HistoryViewer(self.master, self.account_manager, self, self.graph_displayer)
 
         # frame for text area and scrollbars
         text_frame = ttk.Frame(self)
@@ -57,6 +63,8 @@ class CodeDisplayer(tk.Frame):
         ttk.Button(button_frame, text="Open File", command=self.get_code).pack(pady=5)
         ttk.Button(button_frame, text="Clear", command=self.clear_contents).pack(pady=5)
         ttk.Button(button_frame, text="Submit", command=self.submit_code).pack(pady=5)
+        ttk.Button(button_frame, text="History",
+                   command=lambda: self.history_viewer.show_history_popup()).pack(pady=5)
 
         # instructional section
         ttk.Separator(button_frame, orient="horizontal").pack(fill="x", pady=(25, 10))
@@ -197,12 +205,14 @@ class CodeDisplayer(tk.Frame):
             label.pack()
 
         except Exception as e:
-             tk.Label(window, text=f"Error loading graph: {e}").pack()
+            tk.Label(window, text=f"Error loading graph: {e}").pack()
 
 
 # test
 # if __name__ == "__main__":
     # root = tk.Tk()
-    # app = CodeDisplayer(master=root)
+    # am = AccountManager()
+    # gd = GraphDisplayer()
+    # app = CodeDisplayer(master=root, account_manager=am, graph_displayer=gd)
     # app.pack(fill=tk.BOTH, expand=True)
     # root.mainloop()
