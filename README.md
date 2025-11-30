@@ -1,5 +1,5 @@
 # The Optimizer Dev Tool
-# Group 10: The Optimizers
+## Group 10: The Optimizers
 
 The Optimizer Dev Tool is an accessible performance analysis development tool designed 
 for software engineering students and developers to analyze and learn about 
