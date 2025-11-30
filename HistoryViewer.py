@@ -50,7 +50,9 @@ class HistoryViewer:
 
     def delete_item(self, listbox, history):
         if len(listbox.curselection()) == 1:
-            item = history[int(listbox.curselection()[0])]
+            index = int(listbox.curselection()[0])
+            item = history[index]
             self.account_manager.delete_history_item(item)
+            listbox.delete(index)
         else:
             return
