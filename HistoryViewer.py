@@ -15,18 +15,18 @@ class HistoryViewer(tk.Frame):
         # create window
         win = tk.Toplevel(self.master)
         win.title("History")
-        win.geometry("200x200")
+        win.geometry("250x200")
 
         # create frame inside window
         frame = ttk.Frame(win, padding=(3, 3, 3, 3))
-        frame.grid(column=0, row=0, columnspan=2, rowspan=2)
+        frame.grid(column=0, row=0, columnspan=3, rowspan=2)
 
         # create list view of user history
         history = self.account_manager.get_history_log()
         history.reverse()  # reverse history so that newest shows first
         historyvar = tk.StringVar(value=history)
         lb = tk.Listbox(frame, listvariable=historyvar, height=8)
-        lb.grid(column=0, row=0, columnspan=2)
+        lb.grid(column=0, row=0, columnspan=3)
 
         # create view button
         view_btn = ttk.Button(frame, text="View", default="active",
@@ -38,6 +38,11 @@ class HistoryViewer(tk.Frame):
         delete_btn = ttk.Button(frame, text="Delete",
                                 command=lambda: self.delete_item(lb, history))
         delete_btn.grid(column=1, row=1)
+
+        # create clear button
+        clear_btn = ttk.Button(frame, text="Clear history",
+                               command=lambda: self.clear(lb))
+        clear_btn.grid(column=2, row=1)
 
     def display_item(self, listbox, history):
         """Displays code and graph for selected item"""
@@ -59,3 +64,8 @@ class HistoryViewer(tk.Frame):
             listbox.delete(index)
         else:
             return
+
+    def clear(self, listbox):
+        """Clears history"""
+        listbox.delete(0, tk.END)
+        self.account_manager.clear_history()
