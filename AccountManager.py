@@ -1,6 +1,8 @@
 import re
 import os
 import shutil
+import platform
+import ctypes
 from argon2 import PasswordHasher, exceptions
 
 
@@ -78,6 +80,10 @@ class AccountManager:
             hashed = ph.hash(password)
             file.write(hashed.encode("utf-8"))
 
+        # hide file
+        if platform.system() == "Windows":
+            ctypes.windll.kernel32.SetFileAttributesW(f"users/{username}/pass.bin", 2)
+
         print("Account created successfully")
         self.__username = username
 
@@ -132,11 +138,17 @@ class AccountManager:
         if not is_valid_password(new_password):
             return False
 
+        # reveal file
+        if platform.system() == "Windows":
+            ctypes.windll.kernel32.SetFileAttributesW(f"users/{username}/pass.bin", 0)
         with open(f"users/{username}/pass.bin", "wb") as file:
             file.truncate()
             ph = PasswordHasher()
             hashed = ph.hash(new_password)
             file.write(hashed.encode("utf-8"))
+        # hide file
+        if platform.system() == "Windows":
+            ctypes.windll.kernel32.SetFileAttributesW(f"users/{username}/pass.bin", 2)
 
         print("Password successfully changed!")
         return True
@@ -183,15 +195,3 @@ class AccountManager:
             log.write("")
         os.mkdir(f"{self.__username}/data/code")  # create empty directories
         os.mkdir(f"{self.__username}/data/graphs")
-
-
-# test
-def main():
-    am = AccountManager()
-    am.add_account("User", "User123!")
-    # am.delete_account("User", "User123!")
-    # am.login("User", "User123!")
-    # am.change_password("User", "User123!", "User321!")
-
-
-main()
