@@ -1,13 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox
 import os
+import platform
+import subprocess
 from Analyzer import Analyzer
 from FeedbackPopup import FeedbackPopup
 from GraphDisplayer import GraphDisplayer
 
 
 class CodeHighlighter:
-    def __init__(self, text_area, needs_input, inputs):
+    def __init__(self, text_area, needs_input, inputs, username):
         try:
             # get selected text if possible
             self.selected_text = text_area.get("sel.first", "sel.last")
@@ -20,11 +22,12 @@ class CodeHighlighter:
             self.selected = False
         self.needs_input = needs_input
         self.inputs = inputs
+        self.username = username
 
     def submit_selection(self):
         # submits code to be analyzed
         try:
-            with open("data/submission.py", "w+") as file:
+            with open(f"users/{self.username}/data", "w+") as file:
                 if self.selected:
                     file.write("n = 1\ndef main():\n")
                 file.write(self.selected_text)
@@ -35,7 +38,7 @@ class CodeHighlighter:
                 os.fsync(file.fileno())
 
                 # create analyzer object
-                an = Analyzer(program="data/submission.py",
+                an = Analyzer(program=f"users/{self.username}/data",
                               n="n",
                               needs_input=self.needs_input,
                               inputs=self.inputs)

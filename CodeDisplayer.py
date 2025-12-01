@@ -10,8 +10,9 @@ from HelpMenu import HelpMenu
 
 
 class CodeDisplayer(tk.Frame):
-    def __init__(self, master=None, account_manager=None):
+    def __init__(self, username, master=None, account_manager=None):
         super().__init__(master)
+        self.username = username
         self.master = master
         self.master.title("Optimizer Dev Tool")
         self.master.geometry("1280x720")  # temporarily set to 720p res
@@ -185,7 +186,7 @@ class CodeDisplayer(tk.Frame):
                         return
                     inputs.append(user_input)
 
-            selection = CodeHighlighter(self.text_area, needs_input, inputs)
+            selection = CodeHighlighter(self.text_area, needs_input, inputs, self.username)
             selection.submit_selection()
 
     # complexities graph

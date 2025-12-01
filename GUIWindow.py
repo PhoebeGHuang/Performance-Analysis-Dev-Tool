@@ -47,7 +47,7 @@ class GUIWindow:
         self.clear_screen()
 
         # main performance analysis GUI
-        self.current_screen = CodeDisplayer(master=self.root, account_manager=self.account_manager)
+        self.current_screen = CodeDisplayer(self.username, master=self.root, account_manager=self.account_manager)
         self.current_screen.pack(fill="both", expand=True)
 
         # shows username in title
