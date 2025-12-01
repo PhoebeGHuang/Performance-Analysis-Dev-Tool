@@ -4,22 +4,21 @@ from PIL import Image, ImageTk
 from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
 from CodeHighlighter import CodeHighlighter
-from GraphDisplayer import GraphDisplayer
 from AlgorithmDescriber import AlgorithmDescriber
 from HistoryViewer import HistoryViewer
 from HelpMenu import HelpMenu
-from AccountManager import AccountManager
 
 
 class CodeDisplayer(tk.Frame):
-    def __init__(self, master=None, account_manager=None, graph_displayer=None):
+    def __init__(self, master=None, account_manager=None):
         super().__init__(master)
         self.master = master
         self.master.title("Optimizer Dev Tool")
         self.master.geometry("1280x720")  # temporarily set to 720p res
         self.account_manager = account_manager
-        self.graph_displayer = graph_displayer
-        self.history_viewer = HistoryViewer(self.master, self.account_manager, self, self.graph_displayer)
+        self.history_viewer = HistoryViewer(self.master, self.account_manager, self)
+        self.algorithm_describer = AlgorithmDescriber()
+        self.help_menu = HelpMenu(self.master)
 
         # frame for text area and scrollbars
         text_frame = ttk.Frame(self)
@@ -73,7 +72,7 @@ class CodeDisplayer(tk.Frame):
 
         # standard algorithms button
         ttk.Button(button_frame, text="Standard Algorithms",
-                   command=lambda: AlgorithmDescriber().show_popup(self.master), width=15).pack(pady=5)
+                   command=lambda: self.algorithm_describer.show_popup(self.master), width=15).pack(pady=5)
 
         # standard algorithms graph button
         ttk.Button(button_frame, text="Complexities Graph",
@@ -81,7 +80,7 @@ class CodeDisplayer(tk.Frame):
 
         # help menu
         ttk.Button(button_frame, text="User Guide",
-                   command=lambda: HelpMenu(self.master).show_help_popup(), width=15).pack(pady=5)
+                   command=lambda: self.help_menu.show_help_popup(), width=15).pack(pady=5)
 
 
         # instructional note about upload or typing

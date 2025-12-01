@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import os
-from analyzer import Analyzer
+from Analyzer import Analyzer
 from FeedbackPopup import FeedbackPopup
 from GraphDisplayer import GraphDisplayer
 

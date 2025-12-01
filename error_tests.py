@@ -1,5 +1,5 @@
 from unittest import TestCase
-from analyzer import Analyzer
+from Analyzer import Analyzer
 
 
 class TestErrorChecker(TestCase):

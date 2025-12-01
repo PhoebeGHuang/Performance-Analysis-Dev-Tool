@@ -63,7 +63,8 @@ class GraphDisplayer:
             # catches errors while saving
             print(f"Error saving graph: {e}")
 
-    def load_graph(self, file_path):
+    @staticmethod
+    def load_graph(file_path):
         if not os.path.exists(file_path):
             print("Graph file not found.")
             return
