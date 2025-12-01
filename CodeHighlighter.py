@@ -3,7 +3,7 @@ from tkinter import messagebox
 import os
 import platform
 import subprocess
-from analyzer import Analyzer
+from Analyzer import Analyzer
 from FeedbackPopup import FeedbackPopup
 from GraphDisplayer import GraphDisplayer
 
