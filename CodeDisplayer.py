@@ -4,15 +4,13 @@ from PIL import Image, ImageTk
 from tkinter import filedialog, ttk, messagebox, simpledialog
 import os
 from CodeHighlighter import CodeHighlighter
-from GraphDisplayer import GraphDisplayer
 from AlgorithmDescriber import AlgorithmDescriber
 from HistoryViewer import HistoryViewer
 from HelpMenu import HelpMenu
-from AccountManager import AccountManager
 
 
 class CodeDisplayer(tk.Frame):
-    def __init__(self, master=None, account_manager=None, graph_displayer=None):
+    def __init__(self, username, master=None, account_manager=None, graph_displayer=None):
         super().__init__(master)
         self.master = master
         self.master.title("Optimizer Dev Tool")
@@ -20,6 +18,7 @@ class CodeDisplayer(tk.Frame):
         self.account_manager = account_manager
         self.graph_displayer = graph_displayer
         self.history_viewer = HistoryViewer(self.master, self.account_manager, self, self.graph_displayer)
+        self.username = username
 
         # frame for text area and scrollbars
         text_frame = ttk.Frame(self)
@@ -186,7 +185,7 @@ class CodeDisplayer(tk.Frame):
                         return
                     inputs.append(user_input)
 
-            selection = CodeHighlighter(self.text_area, needs_input, inputs)
+            selection = CodeHighlighter(self.text_area, needs_input, inputs, self.username)
             selection.submit_selection()
 
     # complexities graph
