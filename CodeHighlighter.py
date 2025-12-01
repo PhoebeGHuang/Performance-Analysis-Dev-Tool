@@ -1,15 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 import os
-import platform
-import subprocess
 from Analyzer import Analyzer
 from FeedbackPopup import FeedbackPopup
 from GraphDisplayer import GraphDisplayer
 
 
 class CodeHighlighter:
-    def __init__(self, text_area, needs_input, inputs, username):
+    def __init__(self, text_area, program_name, needs_input, inputs, account_manager):
         try:
             # get selected text if possible
             self.selected_text = text_area.get("sel.first", "sel.last")
@@ -20,14 +18,16 @@ class CodeHighlighter:
             # select everything instead
             self.selected_text = text_area.get("1.0", "end-1c").strip()
             self.selected = False
+        self.program_name = program_name
         self.needs_input = needs_input
         self.inputs = inputs
-        self.username = username
+        self.account_manager = account_manager
 
     def submit_selection(self):
         # submits code to be analyzed
         try:
-            with open(f"users/{self.username}/data", "w+") as file:
+            code_path = self.account_manager.get_code_file_path(self.program_name)
+            with open(code_path, "w+") as file:
                 if self.selected:
                     file.write("n = 1\ndef main():\n")
                 file.write(self.selected_text)
@@ -38,7 +38,7 @@ class CodeHighlighter:
                 os.fsync(file.fileno())
 
                 # create analyzer object
-                an = Analyzer(program=f"users/{self.username}/data",
+                an = Analyzer(program=code_path,
                               n="n",
                               needs_input=self.needs_input,
                               inputs=self.inputs)
@@ -51,9 +51,10 @@ class CodeHighlighter:
                         messagebox.showerror(runtime_result, f"Your program could not run properly:\n\n{ec.err}")
                     else:
                         complexity = an.calc.calculate()
-                        FeedbackPopup.show_message("The time complexity of the code is " + complexity)
+                        FeedbackPopup.show_message("The time complexity of the code is " + complexity[1:-1])
                         gd = GraphDisplayer()
                         gd.create_graph(timing_data=an.calc.get_time_data(), complexity_label=complexity)
+                        self.account_manager.add_history_item(self.program_name, gd)
                 else:
                     messagebox.showerror("Syntax error found in your program", ec.err)
 
