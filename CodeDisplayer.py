@@ -10,13 +10,14 @@ from HelpMenu import HelpMenu
 
 
 class CodeDisplayer(tk.Frame):
-    def __init__(self, username, master=None, account_manager=None):
+    def __init__(self, username, master=None, account_manager=None, gui_window=None):
         super().__init__(master)
         self.username = username
         self.master = master
         self.master.title("Optimizer Dev Tool")
-        self.master.geometry("1280x720")  # temporarily set to 720p res
+        self.master.geometry("1280x720")
         self.account_manager = account_manager
+        self.gui_window = gui_window
         self.history_viewer = HistoryViewer(self.master, self.account_manager, self)
         self.algorithm_describer = AlgorithmDescriber()
         self.help_menu = HelpMenu(self.master)
@@ -83,6 +84,17 @@ class CodeDisplayer(tk.Frame):
         ttk.Button(button_frame, text="User Guide",
                    command=lambda: self.help_menu.show_help_popup(), width=15).pack(pady=5)
 
+        # account management section
+        ttk.Separator(button_frame, orient="horizontal").pack(fill="x", pady=(25, 10))
+        ttk.Label(button_frame, text="Account Settings",
+                  font=("Segoe UI", 10, "italic"), foreground="#666").pack(anchor="center", pady=(0, 5))
+
+        ttk.Button(button_frame, text="Change Password",
+                   command=self.change_password).pack(pady=5)
+
+        ttk.Button(button_frame, text="Delete Account",
+                   command=self.delete_account).pack(pady=5)
+
 
         # instructional note about upload or typing
         usage_note = ttk.Label(
@@ -93,7 +105,7 @@ class CodeDisplayer(tk.Frame):
             justify="left",
             wraplength=200
         )
-        usage_note.pack(pady=(15, 0), anchor="w");
+        usage_note.pack(pady=(15, 0), anchor="w")
 
         # instructional note about main files
         note_label = ttk.Label(
@@ -206,6 +218,101 @@ class CodeDisplayer(tk.Frame):
 
         except Exception as e:
             tk.Label(window, text=f"Error loading graph: {e}").pack()
+
+
+    def change_password(self):
+        if not self.username:
+            messagebox.showerror("Error", "No user is currently logged in.")
+            return
+
+        username = self.username
+
+        old_pw = simpledialog.askstring(
+            "Change Password",
+            "Enter your current password:",
+            show="•",
+            parent=self.master
+        )
+        if old_pw is None:
+            return
+
+        new_pw = simpledialog.askstring(
+            "Change Password",
+            "Enter your new password:",
+            show="•",
+            parent=self.master
+        )
+        if new_pw is None:
+            return
+
+        confirm_pw = simpledialog.askstring(
+            "Change Password",
+            "Re-enter your new password:",
+            show="•",
+            parent=self.master
+        )
+        if confirm_pw is None:
+            return
+
+        if new_pw != confirm_pw:
+            messagebox.showerror("Change Password Failed", "New passwords do not match.")
+            return
+
+        success = self.account_manager.change_password(username, old_pw, new_pw)
+
+        if success:
+            messagebox.showinfo("Password Changed", "Your password has been successfully updated.")
+        else:
+            messagebox.showerror(
+                "Change Password Failed",
+                "Password could not be changed.\n"
+                "Check your current password and make sure the new one meets the requirements."
+            )
+
+
+    def delete_account(self):
+        if not self.username:
+            messagebox.showerror("Error", "No user is currently logged in.")
+            return
+
+        username = self.username
+
+        confirm = messagebox.askyesno(
+            "Delete Account",
+            f"Are you sure you want to permanently delete the account '{username}'?\n"
+            "This action cannot be undone."
+        )
+        if not confirm:
+            return
+
+        pw = simpledialog.askstring(
+            "Confirm Password",
+            "Enter your password to confirm account deletion:",
+            show="•",
+            parent=self.master
+        )
+        if pw is None:
+            return
+
+        success = self.account_manager.delete_account(username, pw)
+
+        if success:
+            messagebox.showinfo(
+                "Account Deleted",
+                "Your account has been deleted."
+            )
+            if self.gui_window is not None:
+                # reset GUIWindow state & go back to log in
+                self.gui_window.username = None
+                self.gui_window.show_login_screen()
+        else:
+            messagebox.showerror(
+                "Delete Account Failed",
+                "Account could not be deleted.\nYour password may be incorrect."
+            )
+
+
+
 
 
 # test
