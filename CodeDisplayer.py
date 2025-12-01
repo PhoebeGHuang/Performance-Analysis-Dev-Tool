@@ -158,6 +158,13 @@ class CodeDisplayer(tk.Frame):
             return
 
         else:
+            # ask user to name program
+            program_name = simpledialog.askstring(
+                title="Program name",
+                prompt="Enter a name for your program (name will be stored in history):",
+                parent=self.master
+            )
+
             # check if code needs input
             inputs = []
             while True:
@@ -198,7 +205,7 @@ class CodeDisplayer(tk.Frame):
                         return
                     inputs.append(user_input)
 
-            selection = CodeHighlighter(self.text_area, needs_input, inputs, self.username)
+            selection = CodeHighlighter(self.text_area, program_name, needs_input, inputs, self.account_manager)
             selection.submit_selection()
 
     # complexities graph
