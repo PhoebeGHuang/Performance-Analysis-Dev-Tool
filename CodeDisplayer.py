@@ -267,15 +267,28 @@ class CodeDisplayer(tk.Frame):
 
         success = self.account_manager.change_password(username, old_pw, new_pw)
 
-        if success:
+        if success == "success":
             messagebox.showinfo("Password Changed", "Your password has been successfully updated.")
-        else:
+        elif success == "invalid_info":
             messagebox.showerror(
                 "Change Password Failed",
-                "Password could not be changed.\n"
-                "Check your current password and make sure the new one meets the requirements."
+                "Password could not be changed.\nOld password is incorrect."
             )
-
+        elif success == "new_equals_old":
+            messagebox.showerror(
+                "Change Password Failed",
+                "Password could not be changed.\nNew password cannot be the same as old password."
+            )
+        elif success == "short_password":
+            messagebox.showerror(
+                "Change Password Failed",
+                "Password could not be changed.\nNew password needs to be at least 8 characters."
+            )
+        elif success == "no_special_char":
+            messagebox.showerror(
+                "Change Password Failed",
+                "Password could not be changed.\nNew password must have a special character."
+            )
 
     def delete_account(self):
         if not self.username:
@@ -306,7 +319,7 @@ class CodeDisplayer(tk.Frame):
         if success:
             messagebox.showinfo(
                 "Account Deleted",
-                "Your account has been deleted."
+                "Your account has now been deleted."
             )
             if self.gui_window is not None:
                 # reset GUIWindow state & go back to log in
@@ -315,7 +328,7 @@ class CodeDisplayer(tk.Frame):
         else:
             messagebox.showerror(
                 "Delete Account Failed",
-                "Account could not be deleted.\nYour password may be incorrect."
+                "Account could not be deleted.\nYour password is incorrect."
             )
 
 
