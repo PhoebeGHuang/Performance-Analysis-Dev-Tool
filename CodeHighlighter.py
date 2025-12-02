@@ -27,7 +27,7 @@ class CodeHighlighter:
         # submits code to be analyzed
         try:
             code_path = self.account_manager.get_code_file_path(self.program_name)
-            with open(code_path, "w+") as file:
+            with open(code_path, "xt") as file:
                 if self.selected:
                     file.write("n = 1\ndef main():\n")
                 file.write(self.selected_text)
@@ -58,5 +58,7 @@ class CodeHighlighter:
                 else:
                     messagebox.showerror("Syntax error found in your program", ec.err)
 
+        except FileExistsError:
+            messagebox.showerror("Error saving file", f"A program with the name {self.program_name} already exists.")
         except Exception as e:
             messagebox.showerror("Error submitting file", e)
