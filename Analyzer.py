@@ -175,4 +175,4 @@ class Analyzer:
 
         def __generate_variable_vals(self):
             """Returns values to be used for variable being modified"""
-            return np.array([5, 7, 10, 15, 20, 30, 40, 60, 80, 120, 160, 240, 320])
+            return np.array([2, 3, 5, 8, 12, 18, 27, 41, 62, 93, 140, 210, 315])
