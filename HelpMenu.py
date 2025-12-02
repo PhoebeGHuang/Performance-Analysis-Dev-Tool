@@ -44,6 +44,7 @@ Key Buttons:
 • Open File – Load a Python file
 • Submit – Evaluate runtime complexity
 • Clear – Clears code
+• History – Shows previous runs
 • Standard Algorithms – Shows time complexity references
 • Complexities Graph – Shows common Big-O curves
 
