@@ -12,6 +12,7 @@ from HelpMenu import HelpMenu
 class CodeDisplayer(tk.Frame):
     def __init__(self, username, master=None, account_manager=None, gui_window=None):
         super().__init__(master)
+        self.master.bind("<Return>", lambda event: None)
         self.username = username
         self.master = master
         self.master.title("Optimizer Dev Tool")
