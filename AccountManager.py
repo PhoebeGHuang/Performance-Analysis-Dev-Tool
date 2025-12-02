@@ -84,20 +84,16 @@ class AccountManager:
         return "success"
 
     def delete_account(self, username, password):
-        # verify username
-        hashed = get_hash(username)
-        if hashed is None:
-            return "user_does_not_exist"
-
         # verify password
+        hashed = get_hash(username)
         ph = PasswordHasher()
         if check_password(ph, hashed, password):
             # delete user files
             shutil.rmtree(f"users/{username}")
             self.__username = None
-            return "success"
+            return True
         else:
-            return "incorrect_password"
+            return False
 
     def login(self, username, password):
         # verify username
