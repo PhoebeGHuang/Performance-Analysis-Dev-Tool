@@ -130,13 +130,18 @@ class LoginScreen(ttk.Frame):
 
         created = self.account_manager.add_account(username, password)
 
-        if created:
+        if created == "success":
             messagebox.showinfo(
                 "Account Created",
                 "Account created successfully."
             )
-        else:
-            messagebox.showerror(
-                "Create Account Failed",
-                "Username already exists or does not meet the required format.\nPlease check the constraints."
-            )
+        elif created == "short_password":
+            messagebox.showerror("Account Creation Failed", "Password must be at least 8 characters long.")
+        elif created == "no_special_char":
+            messagebox.showerror("Account Creation Failed", "Password must have a special character.")
+        elif created == "short_username":
+            messagebox.showerror("Account Creation Failed", "Username must be at least 4 characters long.")
+        elif created == "user_has_special_char":
+            messagebox.showerror("Account Creation Failed", "Username cannot have a special character.")
+        elif created == "user_alr_exists":
+            messagebox.showerror("Account Creation Failed", "Username already exists.")

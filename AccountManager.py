@@ -16,13 +16,11 @@ def has_special_char(text):
 def is_valid_password(password):
     # password is at least 8 chars
     if len(password) < 8:
-        print("Password must be at least 8 characters long")
-        return False
+        return "short_password"
     # password must have a special char
     if not has_special_char(password):
-        print("Password must have a special character")
-        return False
-    return True
+        return "no_special_char"
+    return "valid"
 
 
 def get_hash(username):
@@ -51,16 +49,15 @@ class AccountManager:
     def add_account(self, username, password):
         # username is at least 4 chars
         if len(username) < 4:
-            print("Username must be at least 4 characters long")
-            return False
+            return "short_username"
 
         # username must not have special char
         if has_special_char(username):
-            print("Username cannot have a special character")
-            return False
+            return "user_has_special_char"
 
-        if not is_valid_password(password):
-            return False
+        valid = is_valid_password(password)
+        if valid != "valid":
+            return valid
 
         # check if username already exists
         try:
@@ -72,8 +69,7 @@ class AccountManager:
                 pass
 
         except FileExistsError:
-            print("Username already exists")
-            return False
+            return "user_alr_exists"
 
         # store password as a hash
         with open(f"users/{username}/pass.bin", "wb") as file:
@@ -85,35 +81,25 @@ class AccountManager:
         if platform.system() == "Windows":
             ctypes.windll.kernel32.SetFileAttributesW(f"users/{username}/pass.bin", 2)
 
-        print("Account created successfully")
         self.__username = username
-
-        return True
+        return "success"
 
     def delete_account(self, username, password):
-        # verify username
-        hashed = get_hash(username)
-        if hashed is None:
-            print("Username does not exist")
-            return False
-
         # verify password
+        hashed = get_hash(username)
         ph = PasswordHasher()
         if check_password(ph, hashed, password):
             # delete user files
             shutil.rmtree(f"users/{username}")
             self.__username = None
-            print("Account successfully deleted")
             return True
         else:
-            print("Password is incorrect")
             return False
 
     def login(self, username, password):
         # verify username
         hashed = get_hash(username)
         if hashed is None:
-            print("Username or password is incorrect")
             return False
 
         # verify password
@@ -121,23 +107,20 @@ class AccountManager:
         if check_password(ph, hashed, password):
             # login
             self.__username = username
-            print("Successfully logged in!")
             return True
         else:
-            print("Username or password is incorrect")
             return False
 
     def change_password(self, username, old_password, new_password):
         if not self.login(username, old_password):
-            print("Invalid username or password")
-            return False
+            return "invalid_info"
 
         if old_password == new_password:
-            print("New password must not be the same as old password!")
-            return False
+            return "new_equals_old"
 
-        if not is_valid_password(new_password):
-            return False
+        valid = is_valid_password(new_password)
+        if valid != "valid":
+            return valid
 
         # reveal file
         if platform.system() == "Windows":
@@ -151,8 +134,7 @@ class AccountManager:
         if platform.system() == "Windows":
             ctypes.windll.kernel32.SetFileAttributesW(f"users/{username}/pass.bin", 2)
 
-        print("Password successfully changed!")
-        return True
+        return "success"
 
     def get_history_log(self):
         """Reads history log into a list

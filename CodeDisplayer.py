@@ -13,6 +13,7 @@ from AccountManager import has_special_char
 class CodeDisplayer(tk.Frame):
     def __init__(self, username, master=None, account_manager=None, gui_window=None):
         super().__init__(master)
+        self.master.bind("<Return>", lambda event: None)
         self.username = username
         self.master = master
         self.master.title("Optimizer Dev Tool")
@@ -93,8 +94,8 @@ class CodeDisplayer(tk.Frame):
         ttk.Button(button_frame, text="Change Password",
                    command=self.change_password).pack(pady=5)
 
-        # ttk.Button(button_frame, text="Delete Account",
-        #            command=self.delete_account).pack(pady=5)
+#         ttk.Button(button_frame, text="Delete Account",
+#                    command=self.delete_account).pack(pady=5)
 
 
         # instructional note about upload or typing
@@ -271,15 +272,28 @@ class CodeDisplayer(tk.Frame):
 
         success = self.account_manager.change_password(username, old_pw, new_pw)
 
-        if success:
+        if success == "success":
             messagebox.showinfo("Password Changed", "Your password has been successfully updated.")
-        else:
+        elif success == "invalid_info":
             messagebox.showerror(
                 "Change Password Failed",
-                "Password could not be changed.\n"
-                "Check your current password and make sure the new one meets the requirements."
+                "Password could not be changed.\nOld password is incorrect."
             )
-
+        elif success == "new_equals_old":
+            messagebox.showerror(
+                "Change Password Failed",
+                "Password could not be changed.\nNew password cannot be the same as old password."
+            )
+        elif success == "short_password":
+            messagebox.showerror(
+                "Change Password Failed",
+                "Password could not be changed.\nNew password needs to be at least 8 characters."
+            )
+        elif success == "no_special_char":
+            messagebox.showerror(
+                "Change Password Failed",
+                "Password could not be changed.\nNew password must have a special character."
+            )
 
     def delete_account(self):
         if not self.username:
@@ -310,7 +324,7 @@ class CodeDisplayer(tk.Frame):
         if success:
             messagebox.showinfo(
                 "Account Deleted",
-                "Your account has been deleted."
+                "Your account has now been deleted."
             )
             if self.gui_window is not None:
                 # reset GUIWindow state & go back to log in
@@ -319,7 +333,7 @@ class CodeDisplayer(tk.Frame):
         else:
             messagebox.showerror(
                 "Delete Account Failed",
-                "Account could not be deleted.\nYour password may be incorrect."
+                "Account could not be deleted.\nYour password is incorrect."
             )
 
 
