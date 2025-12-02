@@ -94,8 +94,8 @@ class CodeDisplayer(tk.Frame):
         ttk.Button(button_frame, text="Change Password",
                    command=self.change_password).pack(pady=5)
 
-#         ttk.Button(button_frame, text="Delete Account",
-#                    command=self.delete_account).pack(pady=5)
+        ttk.Button(button_frame, text="Delete Account",
+                   command=self.delete_account).pack(pady=5)
 
 
         # instructional note about upload or typing
@@ -166,6 +166,8 @@ class CodeDisplayer(tk.Frame):
                 prompt="Enter a name for your program (name will be stored in history):",
                 parent=self.master
             )
+            if program_name is None:  # exits if user clicks cancel
+                return
             if has_special_char(program_name):
                 messagebox.showerror("Invalid name", "Program name can only contain letters, numbers, and underscores.")
                 return
