@@ -1,6 +1,7 @@
 import re
 import os
 import shutil
+from pathlib import Path
 import platform
 import ctypes
 from argon2 import PasswordHasher, exceptions
@@ -178,9 +179,11 @@ class AccountManager:
 
     def clear_history(self):
         """Removes all history data"""
-        shutil.rmtree(f"users/{self.__username}/data/code")  # delete all data
-        shutil.rmtree(f"users/{self.__username}/data/graphs")
+        directory = Path(f"users/{self.__username}/data/code")  # delete all data
+        for file in directory.glob("*.py"):
+            file.unlink()
+        directory = Path(f"users/{self.__username}/data/graphs")
+        for file in directory.glob("*.png"):
+            file.unlink()
         with open(f"users/{self.__username}/data/history_log.txt", "w") as log:  # clear history log
             log.write("")
-        os.mkdir(f"users/{self.__username}/data/code")  # create empty directories
-        os.mkdir(f"users/{self.__username}/data/graphs")
