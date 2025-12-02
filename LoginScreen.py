@@ -48,7 +48,7 @@ class LoginScreen(ttk.Frame):
             text="Log in",
             font=("Segoe UI", 22, "bold"),
             bg="#f5f5f5"
-        ).pack(pady=(0, 25))
+        ).pack(pady=(0, 20))
 
         # username
         tk.Label(form, text="Username", font=("Segoe UI", 11), bg="#f5f5f5").pack(anchor="w")
@@ -64,15 +64,40 @@ class LoginScreen(ttk.Frame):
             form,
             text="Log In",
             command=self.attempt_login,
-            width=20
+            width=15
         ).pack(pady=(0, 8))
 
         ttk.Button(
             form,
             text="Create Account",
             command=self.create_account,
-            width=20
+            width=15
         ).pack()
+
+
+        # constraints info
+        constraints_text = (
+            "Username requirements:\n"
+            "• At least 4 characters\n"
+            "• Letters, numbers, or underscores only\n\n"
+            "Password requirements:\n"
+            "• At least 8 characters\n"
+            "• Must include at least one special character"
+        )
+
+        tk.Label(
+            form,
+            text=constraints_text,
+            font=("Segoe UI", 9),
+            fg="#666",
+            bg="#f5f5f5",
+            justify="left"
+        ).pack(anchor="w", pady=(40, 0))
+
+        self.username_entry.focus_set()
+
+        # enter submits login
+        self.master.bind("<Return>", lambda event: self.attempt_login())
 
         self.pack(fill="both", expand=True)
 
@@ -105,13 +130,18 @@ class LoginScreen(ttk.Frame):
 
         created = self.account_manager.add_account(username, password)
 
-        if created:
+        if created == "success":
             messagebox.showinfo(
                 "Account Created",
-                "Account created successfully. You may now log in."
+                "Account created successfully."
             )
-        else:
-            messagebox.showerror(
-                "Create Account Failed",
-                "Username already exists or does not meet the required format.\nPlease check the guidelines."
-            )
+        elif created == "short_password":
+            messagebox.showerror("Account Creation Failed", "Password must be at least 8 characters long.")
+        elif created == "no_special_char":
+            messagebox.showerror("Account Creation Failed", "Password must have a special character.")
+        elif created == "short_username":
+            messagebox.showerror("Account Creation Failed", "Username must be at least 4 characters long.")
+        elif created == "user_has_special_char":
+            messagebox.showerror("Account Creation Failed", "Username cannot have a special character.")
+        elif created == "user_alr_exists":
+            messagebox.showerror("Account Creation Failed", "Username already exists.")
