@@ -93,8 +93,8 @@ class CodeDisplayer(tk.Frame):
         ttk.Button(button_frame, text="Change Password",
                    command=self.change_password).pack(pady=5)
 
-        ttk.Button(button_frame, text="Delete Account",
-                   command=self.delete_account).pack(pady=5)
+        # ttk.Button(button_frame, text="Delete Account",
+        #            command=self.delete_account).pack(pady=5)
 
 
         # instructional note about upload or typing
