@@ -36,7 +36,7 @@ class HistoryViewer(tk.Frame):
 
         # create delete button
         delete_btn = ttk.Button(frame, text="Delete",
-                                command=lambda: self.delete_items(lb, history))
+                                command=lambda: self.delete_item(lb, history))
         delete_btn.grid(column=1, row=1)
 
         # create clear button
@@ -55,12 +55,15 @@ class HistoryViewer(tk.Frame):
         else:
             return
 
-    def delete_items(self, listbox, history):
-        for i in range(len(listbox.curselection())):
-            index = int(listbox.curselection()[i])
+    def delete_item(self, listbox, history):
+        """Deletes item from history"""
+        if len(listbox.curselection()) == 1:
+            index = int(listbox.curselection()[0])
             item = history[index]
             self.account_manager.delete_history_item(item)
             listbox.delete(index)
+        else:
+            return
 
     def clear(self, listbox):
         """Clears history"""
