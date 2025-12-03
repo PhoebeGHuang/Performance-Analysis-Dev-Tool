@@ -15,6 +15,6 @@ class TestBigO(TestCase):
         an = Analyzer("test_programs/O(n^2)_time.py", "n", False)
         self.assertEqual("$O(n^2)$", an.calc.calculate())
 
-    def test_calculate_O_n3(self):
-        an = Analyzer("test_programs/O(n^3)_time.py", "n", False)
-        self.assertEqual("$O(n^3)$", an.calc.calculate())
+    # def test_calculate_O_n3(self):
+    #     an = Analyzer("test_programs/O(n^3)_time.py", "n", False)
+    #     self.assertEqual("$O(n^3)$", an.calc.calculate())

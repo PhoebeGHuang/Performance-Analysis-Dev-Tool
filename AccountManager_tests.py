@@ -23,22 +23,22 @@ class TestAccountManager(TestCase):
 
         # test short username
         val = am.add_account("aaa", "password123!")
-        self.assertFalse(val)
+        self.assertEqual("short_username", val)
 
         # test username with special chars
         val = am.add_account("%User%", "password123!")
-        self.assertFalse(val)
+        self.assertEqual("user_has_special_char", val)
 
     def test_invalid_password(self):
         am = AccountManager()
 
         # test short password
         val = am.add_account("User123", "pass!")
-        self.assertFalse(val)
+        self.assertEqual("short_password", val)
 
         # test password with no special chars
         val = am.add_account("User123", "good_password")
-        self.assertFalse(val)
+        self.assertEqual("no_special_char", val)
 
     def test_delete_account(self):
         am = AccountManager()
@@ -80,20 +80,20 @@ class TestAccountManager(TestCase):
 
         # test invalid old password
         val = am.change_password("New_User123", "old_password!", "new_password!")
-        self.assertFalse(val)
+        self.assertEqual("invalid_info", val)
 
         # test same old/new password
         val = am.change_password("New_User123", "password123!", "password123!")
-        self.assertFalse(val)
+        self.assertEqual("new_equals_old", val)
 
         # test invalid new password
         val = am.change_password("New_User123", "password123!", "pass!")
-        self.assertFalse(val)
+        self.assertEqual("short_password", val)
         val = am.change_password("New_User123", "password123!", "new_password")
-        self.assertFalse(val)
+        self.assertEqual("no_special_char", val)
 
         # test successful
         val = am.change_password("New_User123", "password123!", "new_password123!")
-        self.assertTrue(val)
+        self.assertEqual("success", val)
 
         am.delete_account("New_User123", "new_password123!")
