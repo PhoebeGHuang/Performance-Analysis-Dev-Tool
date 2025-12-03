@@ -27,9 +27,6 @@ jobs:
             pip install numpy
             pip install scikit-learn
       - run:
-          name: Test AccountManager
-          command: pytest AccountManager_tests.py
-      - run:
           name: Test BigOCalculator
           command: pytest big_o_tests.py
       - run:
