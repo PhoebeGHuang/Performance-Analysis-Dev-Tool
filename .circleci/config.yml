@@ -25,7 +25,7 @@ jobs:
             pip install argon2-cffi
             pip install matplotlib
             pip install numpy
-            pip install sklearn
+            pip install scikit-learn
       - run:
           name: Test AccountManager
           command: pytest AccountManager_tests.py
